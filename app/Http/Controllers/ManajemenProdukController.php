@@ -11,8 +11,7 @@ class ManajemenProdukController extends Controller
 {
     public function index()
     {
-        $produk = Produk::all();
-
+        $produk = Produk::where('user_id', Auth::id())->get();
         return view('produk.index', compact('produk'));
     }
 
@@ -45,15 +44,15 @@ class ManajemenProdukController extends Controller
         return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function edit(Produk $produk)
     {
-        $produk = Produk::where('user_id', Auth::id())->findOrFail($id);
+        $this->authorizeProduct($produk);
         return view('produk.edit', compact('produk'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Produk $produk)
     {
-        $produk = Produk::where('user_id', Auth::id())->findOrFail($id);
+        $this->authorizeProduct($produk);
 
         $request->validate([
             'nama_produk' => 'required|string|max:255',
@@ -75,14 +74,23 @@ class ManajemenProdukController extends Controller
         return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Produk $produk)
     {
-        $produk = Produk::where('user_id', Auth::id())->findOrFail($id);
+        $this->authorizeProduct($produk);
+
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }
+
         $produk->delete();
 
         return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    private function authorizeProduct(Produk $produk)
+    {
+        if ($produk->user_id !== Auth::id()) {
+            abort(403);
+        }
     }
 }

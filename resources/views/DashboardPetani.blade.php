@@ -21,6 +21,7 @@
                 <th class="border border-gray-300 px-4 py-2">Nama Produk</th>
                 <th class="border border-gray-300 px-4 py-2">Harga</th>
                 <th class="border border-gray-300 px-4 py-2">Stok</th>
+                <th class="border border-gray-300 px-4 py-2">Gambar</th>
                 <th class="border border-gray-300 px-4 py-2">Aksi</th>
             </tr>
         </thead>
@@ -30,18 +31,25 @@
                     <td class="border border-gray-300 px-4 py-2">{{ $item->nama_produk }}</td>
                     <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $item->stok }}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                        @if($item->gambar)
+                            <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Produk" class="w-16 h-16 object-cover mx-auto">
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td class="border border-gray-300 px-4 py-2 space-x-2">
-                        <a href="{{ route('produk.edit', $item->id) }}" class="text-blue-600 hover:underline">Edit</a>
-                        <form action="{{ route('produk.destroy', $item->id) }}" method="POST" class="inline-block">
+                        <a href="{{ route('produk.edit', $item->product_id) }}" class="text-blue-600 hover:underline">Edit</a>
+                        <form action="{{ route('produk.destroy', $item->product_id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" onclick="return confirm('Yakin hapus produk?')" class="text-red-600 hover:underline">Hapus</button>
+                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="text-center border border-gray-300 px-4 py-2">Belum ada produk</td>
+                    <td colspan="5" class="text-center border border-gray-300 px-4 py-2">Belum ada produk.</td>
                 </tr>
             @endforelse
         </tbody>
