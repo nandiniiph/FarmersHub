@@ -12,16 +12,22 @@
 @extends($layout)
 
 @section("content")
-@if (session('success'))
-    <div class="bg-green-500 text-white p-4 rounded mb-4 text-center">
-        {{ session('success') }}
-    </div>
-@endif
-
 <main class="p-6">
 
     <div class="bg-white shadow-md rounded-lg p-8 max-w-2xl mx-auto">
         <h2 class="text-2xl font-bold mb-6 text-center">Edit Profil</h2>
+
+        <div class="flex justify-center">
+            @if ($errors->any())
+                <div class="mb-4 text-red-500">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        </div>
 
         <form action="{{ route('updateProfil') }}" method="POST">
             @csrf

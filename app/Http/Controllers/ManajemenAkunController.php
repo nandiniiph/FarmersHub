@@ -25,13 +25,13 @@ class ManajemenAkunController extends Controller
     public function updateProfil(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:30|unique:user,username,' . Auth::id(),
-            'email' => 'required|email|unique:user,email,' . Auth::id(),
-            'password' => 'nullable|min:6|confirmed',
+            'username' => 'required|string|max:30|unique:user,username,' . Auth::id() .',user_id',
+            'email' => 'required|email|unique:user,email,' . Auth::id() .',user_id',
+            'password' => 'nullable|min:6',
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            return back()->withErrors(['error' => 'Gagal mengedit profil'])->withInput();
         }
 
         $userId = Auth::id();
@@ -50,5 +50,4 @@ class ManajemenAkunController extends Controller
 
         return redirect()->route('profil.index')->with('success', 'Profil berhasil diedit!');
     }
-
 }
