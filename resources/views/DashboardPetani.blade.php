@@ -12,7 +12,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach($produk as $item)
                 <div class="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition p-4">
-                    <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Produk" class="w-full h-40 object-cover rounded mb-4">
+                    <<img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Produk" class="w-full h-40 object-cover rounded mb-4">
                     <h2 class="text-lg font-semibold">{{ $item->nama_produk }}</h2>
                     <p class="text-green-700 font-medium">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
                     <p class="text-sm text-gray-600">Stok: {{ $item->stok }}</p>
