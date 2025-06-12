@@ -96,13 +96,14 @@ class LoginController extends Controller
 
         return redirect()->route('showLogin')->with('success', 'Registrasi berhasil, silakan login!');
     }
+
     public function logout(Request $request)
     {
-        Auth::logout(); // logout pengguna
-        $request->session()->invalidate(); // hapus sesi lama
-        $request->session()->regenerateToken(); // buat token baru untuk keamanan
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return view('LandingPage'); // arahkan ke landing page
+        return view('LandingPage');
     }
 
 }

@@ -18,13 +18,11 @@ Route::get('/DashboardAdmin', [LoginController::class, 'showDashboardAdmin'])->n
 Route::get('/DashboardKonsumen', [LoginController::class, 'showDashboardKonsumen'])->name('showDashboardKonsumen');
 Route::get('/DashboardPetani', [LoginController::class, 'showDashboardPetani'])->name('showDashboardPetani');
 
-Route::get('/Profile', [ManajemenAkunController::class, 'profile'])->middleware('auth')->name('profile.index');
+Route::get('/Profil', [ManajemenAkunController::class, 'profil'])->middleware('auth')->name('profil.index');
+Route::get('/EditProfil', [ManajemenAkunController::class, 'showEditProfil'])->middleware('auth')->name('showEditProfil');
+Route::post('/proses-EditProfil', [ManajemenAkunController::class, 'updateProfil'])->name('updateProfil');
 
 Route::resource('produk', ManajemenProdukController::class);
-
-Route::get('/akun-petani', function () {
-    return 'Halaman Akun Petani';
-})->name('akun.petani');
 
 Route::get('/penjualan', function () {
     return 'Halaman Penjualan';
