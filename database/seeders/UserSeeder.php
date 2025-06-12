@@ -99,7 +99,6 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($datas as $data) {
-            $data['password'] = Hash::make($data['password']);
             Akun::create($data);
         }
     }
