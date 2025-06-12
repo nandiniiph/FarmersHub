@@ -17,7 +17,7 @@ class ManajemenProdukController extends Controller
 
     public function create()
     {
-        return view('produk/tambahProduk');
+        return view('produk.tambahProduk');
     }
 
     public function store(Request $request)
@@ -44,14 +44,16 @@ class ManajemenProdukController extends Controller
         return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    public function edit(Produk $produk)
+    public function edit($id)
     {
+        $produk = Produk::findOrFail($id);
         $this->authorizeProduct($produk);
-        return view('produk/editProduk', compact('produk'));
+        return view('produk.editProduk', compact('produk'));
     }
 
-    public function update(Request $request, Produk $produk)
+    public function update(Request $request, $id)
     {
+        $produk = Produk::findOrFail($id);
         $this->authorizeProduct($produk);
 
         $request->validate([
@@ -74,8 +76,9 @@ class ManajemenProdukController extends Controller
         return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
-    public function destroy(Produk $produk)
+    public function destroy($id)
     {
+        $produk = Produk::findOrFail($id);
         $this->authorizeProduct($produk);
 
         if ($produk->gambar) {
