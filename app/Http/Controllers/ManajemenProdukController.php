@@ -17,7 +17,7 @@ class ManajemenProdukController extends Controller
 
     public function create()
     {
-        return view('produk.create');
+        return view('produk/tambahProduk');
     }
 
     public function store(Request $request)
@@ -34,11 +34,11 @@ class ManajemenProdukController extends Controller
 
         Produk::create([
             'user_id' => Auth::id(),
+            'gambar' => $gambarPath,
             'nama_produk' => $request->nama_produk,
             'deskripsi' => $request->deskripsi,
             'harga' => $request->harga,
             'stok' => $request->stok,
-            'gambar' => $gambarPath,
         ]);
 
         return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan.');
@@ -47,7 +47,7 @@ class ManajemenProdukController extends Controller
     public function edit(Produk $produk)
     {
         $this->authorizeProduct($produk);
-        return view('produk.edit', compact('produk'));
+        return view('produk/editProduk', compact('produk'));
     }
 
     public function update(Request $request, Produk $produk)
