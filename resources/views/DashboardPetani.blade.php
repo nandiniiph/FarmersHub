@@ -2,57 +2,24 @@
 
 @section('content')
 <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Manajemen Produk</h1>
+    <!-- Welcoming -->
+    <h1 class="text-2xl font-bold mb-2">Selamat datang, {{ Auth::user()->username }}</h1>
+    <p class="text-gray-600 mb-6">Berikut adalah daftar produk anda</p>
 
-    @if(session('success'))
-        <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            {{ session('success') }}
+    @if($produk->isEmpty())
+        <p class="text-gray-600">Belum ada produk yang ditambahkan.</p>
+    @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            @foreach($produk as $item)
+                <div class="bg-white border border-gray-200 rounded-lg shadow hover:shadow-md transition p-4">
+                    <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Produk" class="w-full h-40 object-cover rounded mb-4">
+                    <h2 class="text-lg font-semibold">{{ $item->nama_produk }}</h2>
+                    <p class="text-green-700 font-medium">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
+                    <p class="text-sm text-gray-600">Stok: {{ $item->stok }}</p>
+
+                </div>
+            @endforeach
         </div>
     @endif
-
-    <div class="mb-4">
-        <a href="{{ route('produk.create') }}"
-           class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">+ Tambah Produk</a>
-    </div>
-
-    <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-green-200">
-                <th class="border border-gray-300 px-4 py-2">Nama Produk</th>
-                <th class="border border-gray-300 px-4 py-2">Harga</th>
-                <th class="border border-gray-300 px-4 py-2">Stok</th>
-                <th class="border border-gray-300 px-4 py-2">Gambar</th>
-                <th class="border border-gray-300 px-4 py-2">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($produk as $item)
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">{{ $item->nama_produk }}</td>
-                    <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $item->stok }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        @if($item->gambar)
-                            <img src="{{ asset('storage/' . $item->gambar) }}" alt="Gambar Produk" class="w-16 h-16 object-cover mx-auto">
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td class="border border-gray-300 px-4 py-2 space-x-2">
-                        <a href="{{ route('produk.edit', $item->product_id) }}" class="text-blue-600 hover:underline">Edit</a>
-                        <form action="{{ route('produk.destroy', $item->product_id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center border border-gray-300 px-4 py-2">Belum ada produk.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
 </div>
 @endsection
