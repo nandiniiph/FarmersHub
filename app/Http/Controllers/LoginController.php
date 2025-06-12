@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Akun;
+use App\Models\Produk;
 
 class LoginController extends Controller
 {
@@ -31,7 +32,7 @@ class LoginController extends Controller
 
     public function showDashboardPetani()
     {
-        $produk = \App\Models\Produk::where('user_id', Auth::id())->get();
+        $produk = Produk::where('user_id', Auth::id())->get();
         return view('DashboardPetani', compact('produk'));
     }
 
@@ -88,7 +89,7 @@ class LoginController extends Controller
         Akun::create([
             'username' => $request->username,
             'email' => $request->email,
-            'password' => $request->password, // tidak di-hash
+            'password' => $request->password,
             'role' => 'konsumen',
             'status' => true,
         ]);

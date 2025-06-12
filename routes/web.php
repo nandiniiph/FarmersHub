@@ -3,6 +3,7 @@
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ManajemenProdukController;
+use App\Http\Controllers\ManajemenAkunController;
 
 
 Route::get('/', function () {
@@ -16,6 +17,9 @@ Route::post('/proses-Register', [LoginController::class, 'register'])->name('reg
 Route::get('/DashboardAdmin', [LoginController::class, 'showDashboardAdmin'])->name('showDashboardAdmin');
 Route::get('/DashboardKonsumen', [LoginController::class, 'showDashboardKonsumen'])->name('showDashboardKonsumen');
 Route::get('/DashboardPetani', [LoginController::class, 'showDashboardPetani'])->name('showDashboardPetani');
+
+Route::get('/Profile', [ManajemenAkunController::class, 'profile'])->middleware('auth')->name('profile.index');
+
 Route::resource('produk', ManajemenProdukController::class);
 
 Route::get('/akun-petani', function () {

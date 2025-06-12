@@ -6,7 +6,7 @@
                     <a href="{{ route('showDashboardPetani') }}">FarmersHub</a>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8 ml-10">
-                    <a href="{{ route('akun.petani') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Akun</a>
+                    <a href="{{ route('profile.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Akun</a>
                     <a href="{{ route('penjualan.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Belanja</a>
                     <a href="{{ route('riwayat.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Riwayat</a>
                     <a href="{{ route('produk.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Produk</a>
