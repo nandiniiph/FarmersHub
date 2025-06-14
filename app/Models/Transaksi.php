@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Transaksi extends Model
 {
     use HasFactory;
+
     protected $table = 'transaksi';
     protected $primaryKey = 'transaksi_id';
     public $timestamps = true;
+
     protected $fillable = [
         'user_id',
         'tanggal_transaksi',
@@ -18,11 +20,25 @@ class Transaksi extends Model
         'status'
     ];
 
-    public function Akun(){
+    public function Akun()
+    {
         return $this->belongsTo(Akun::class, 'user_id');
     }
 
-    public function DetailTransaksi(){
+    public function DetailTransaksi()
+    {
         return $this->hasMany(DetailTransaksi::class, 'transaksi_id');
+    }
+
+    public function Produk()
+    {
+        return $this->hasManyThrough(
+            Produk::class,
+            DetailTransaksi::class,
+            'transaksi_id',
+            'product_id',
+            'transaksi_id',
+            'product_id'
+        );
     }
 }

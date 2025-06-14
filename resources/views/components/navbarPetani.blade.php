@@ -8,10 +8,11 @@
             </div>
             <div class="flex items-center">
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8 ml-10">
-                    <a href="{{ route('penjualan.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Belanja</a>
-                    <a href="{{ route('riwayat.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Riwayat</a>
+                    <a href="{{ route('belanja.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Belanja</a>
+                    <a href="{{ route('keranjang.lihat') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Keranjang</a>
+                    <a href="{{ route('transaksi.pesanan') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Pesanan</a>
+                    <a href="{{ route('transaksi.riwayat') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Riwayat</a>
                     <a href="{{ route('produk.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Produk</a>
-                    <a href="{{ route('pesanan.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Pesanan</a>
                     <a href="{{ route('profil.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Profil</a>
                 </div>
             </div>
