@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>FarmersHub - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <header class="sticky top-0 z-50">
-
-    </header>
+    @include('components.navbarAdmin')
 
     <body>
-
+        @yield('content')
     </body>
 
-    <footer>
-        @include("components.footer")
-    </footer>
+    @include('components.footer')
 
 </body>
 </html>

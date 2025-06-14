@@ -19,7 +19,6 @@
 </head>
 
 <body class="bg-white">
-    <!-- Navigation -->
     <nav class="bg-white shadow-sm border-b fixed w-full z-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center h-16 flex-wrap">
@@ -35,7 +34,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section id="beranda" class="pt-16 gradient-bg">
         <div class="max-w-6xl mx-auto px-4 py-20">
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -66,7 +64,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section id="why-us" class="py-16 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="text-center mb-12">
@@ -104,7 +101,6 @@
         </div>
     </section>
 
-    <!-- How It Works Section -->
     <section id="cara-kerja" class="py-16 bg-white">
         <div class="max-w-6xl mx-auto px-4">
             <div class="text-center mb-12">
@@ -146,7 +142,6 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
     <section class="py-16 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Apa Kata Mereka?</h2>
@@ -167,7 +162,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section id="tentang" class="py-16 bg-white">
         <div class="max-w-6xl mx-auto px-4">
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -216,7 +210,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="py-16 bg-green-600">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-white mb-4">Siap Bergabung dengan FarmersHub?</h2>
@@ -234,7 +227,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-6xl mx-auto px-4">
             <div class="grid md:grid-cols-4 gap-8">
