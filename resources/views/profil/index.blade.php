@@ -12,11 +12,11 @@
 @extends($layout)
 
 @section("content")
-@if (session('success'))
-    <div class="bg-green-500 text-white p-4 rounded mb-4 text-center">
-        {{ session('success') }}
-    </div>
-@endif
+@if(session('success'))
+            <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 text-center rounded">
+                {{ session('success') }}
+            </div>
+        @endif
 
 <main class="p-6">
 
@@ -48,7 +48,7 @@
             <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="inline">
                 @csrf
                 <button type="button" id="logoutButton" class="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2 rounded">
-                    LogOut
+                    Logout
                 </button>
             </form>
         </div>
@@ -61,7 +61,7 @@
             <p>Apakah Anda yakin ingin keluar dari sistem?</p>
             <div class="flex justify-end mt-4">
                 <button id="cancelLogout" class="bg-gray-300 text-gray-700 px-4 py-2 rounded mr-2">Tidak</button>
-                <button id="confirmLogout" class="bg-red-600 text-white px-4 py-2 rounded">LogOut</button>
+                <button id="confirmLogout" class="bg-red-600 text-white px-4 py-2 rounded">Logout</button>
             </div>
         </div>
     </div>

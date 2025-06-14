@@ -9,15 +9,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- Navbar Petani -->
     @include('components.navbarPetani')
 
-    <!-- Main Content -->
     <main class="flex-1 container mx-auto p-6">
         @yield('content')
     </main>
 
-    <!-- Footer -->
     @include('components.footer')
 
 </body>

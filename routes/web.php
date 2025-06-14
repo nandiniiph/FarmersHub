@@ -20,7 +20,7 @@ Route::get('/DashboardKonsumen', [LoginController::class, 'showDashboardKonsumen
 Route::get('/DashboardPetani', [LoginController::class, 'showDashboardPetani'])->name('showDashboardPetani');
 
 Route::get('/Profil', [ManajemenAkunController::class, 'profil'])->middleware('auth')->name('profil.index');
-Route::get('/EditProfil', [ManajemenAkunController::class, 'showEditProfil'])->middleware('auth')->name('showEditProfil');
+Route::get('/EditProfil', [ManajemenAkunController::class, 'showEditProfil'])->name('showEditProfil');
 Route::post('/proses-EditProfil', [ManajemenAkunController::class, 'updateProfil'])->name('updateProfil');
 
 Route::get('/produk/index', [ManajemenProdukController::class, 'index'])->name('produk.index');
