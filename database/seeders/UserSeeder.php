@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
                 'updated_at' => now()->subDays(28),
             ],
             [
-                'username' => 'roni',
+                'username' => 'soni',
                 'email' => 'petani1@gmail.com',
                 'password' => 'password123',
                 'role' => 'Petani',

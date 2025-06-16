@@ -8,8 +8,8 @@
             </div>
             <div class="flex items-center">
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8 ml-10">
-                    <a href="#" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Upgrade</a>
-                    <a href="#" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Akun</a>
+                    <a href="{{ route('upgrade.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Upgrade</a>
+                    <a href="{{ route('akun.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Manajemen Akun</a>
                     <a href="{{ route('profil.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Profil</a>
                 </div>
             </div>

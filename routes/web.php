@@ -8,6 +8,7 @@ use App\Http\Controllers\BelanjaController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\ProfilController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', fn() => view('LandingPage'));
 
@@ -47,6 +48,16 @@ Route::get('/dashboard', function () {
 Route::get('/profil', [ManajemenAkunController::class, 'profil'])->middleware('auth')->name('profil.index');
 Route::get('/EditProfil', [ManajemenAkunController::class, 'showEditProfil'])->name('showEditProfil');
 Route::post('/proses-EditProfil', [ManajemenAkunController::class, 'updateProfil'])->name('updateProfil');
+
+// Akun
+Route::get('/akun', [ManajemenAkunController::class, 'showAkun'])->name('akun.index');
+Route::get('/akunFilter', [ManajemenAkunController::class, 'FilterAkun'])->name('FilterAkun');
+Route::post('/akun/{id}/delete', [ManajemenAkunController::class, 'HapusAkun'])->name('HapusAkun');
+
+// Upgrade
+Route::get('/PengajuanUpgrade', [UpgradeController::class, 'showTambahUpgrade'])->name('showTambahUpgrade');
+Route::get('/KonfirmasiUpgrade', [UpgradeController::class, 'index'])->name('upgrade.index');
+Route::post('/tambahUpgrade', [UpgradeController::class, 'createPengajuan'])->name('createPengajuan');
 
 // Produk (Petani)
 Route::prefix('produk')->group(function () {

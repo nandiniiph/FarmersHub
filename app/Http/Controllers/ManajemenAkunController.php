@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Akun;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -20,6 +21,13 @@ class ManajemenAkunController extends Controller
     {
         $user = Auth::user();
         return view('profil.editProfil', compact('user'));
+    }
+
+    public function showAkun(){
+        $akun = Akun::where('status', true)
+                    ->where('role', '!=', 'Admin')
+                    ->get();
+        return view('akun.index', compact('akun'));
     }
 
     public function updateProfil(Request $request)
@@ -49,5 +57,32 @@ class ManajemenAkunController extends Controller
             ->update($newData);
 
         return redirect()->route('profil.index')->with('success', 'Profil berhasil diedit!');
+    }
+
+    public function HapusAkun($id)
+    {
+        $akun = Akun::findOrFail($id);
+        if ($akun) {
+            $akun->status = 0;
+            $akun->save();
+        }
+        return redirect()->route('akun.index')->with('success', 'Akun berhasil dihapus.');
+    }
+
+    public function FilterAkun(Request $request)
+    {
+        $filter = $request->input('filter', 'semua');
+        if ($filter === 'petani') {
+            $akun = Akun::where('role', 'Petani')
+                        ->where('status', 1)
+                        ->get();
+        } elseif ($filter === 'konsumen') {
+            $akun = Akun::where('role', 'Konsumen')
+                        ->where('status', 1)
+                        ->get();
+        } else {
+            $akun = Akun::where('status', 1)->get();
+        }
+        return view('akun.index', compact('akun'));
     }
 }

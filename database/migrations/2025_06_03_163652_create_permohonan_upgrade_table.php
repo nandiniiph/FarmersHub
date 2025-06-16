@@ -19,6 +19,10 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->date('tanggal_permohonan');
+            $table->string('nama_lengkap', 100);
+            $table->string('nomor_hp', 15);
+            $table->string('nama_usaha', 100);
+            $table->string('alamat_lengkap', 100);
             $table->enum('status', ['Menunggu', 'Disetujui', 'Ditolak']);
             $table->text('catatan_admin');
             $table->timestamps();

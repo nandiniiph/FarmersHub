@@ -14,8 +14,16 @@ class PermohonanUpgrade extends Model
     protected $fillable = [
         'user_id',
         'tanggal_permohonan',
+        'nama_lengkap',
+        'nomor_hp',
+        'nama_usaha',
+        'alamat_lengkap',
         'status',
         'catatan_admin'
+    ];
+
+    protected $dates = [
+        'tanggal_permohonan',
     ];
 
     public function Akun(){
