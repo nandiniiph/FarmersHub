@@ -27,14 +27,14 @@ class LoginController extends Controller
 
     public function showDashboardKonsumen()
     {
-        return view('DashboardKonsumen');
+        return view('belanja.index');
     }
 
     public function showDashboardPetani()
     {
-        $produk = Produk::where('user_id', Auth::id())->get();
-        return view('DashboardPetani', compact('produk'));
+        return redirect()->route('belanja.index');
     }
+
 
 
     public function login(Request $request)
@@ -62,9 +62,8 @@ class LoginController extends Controller
                 case 'Admin':
                     return redirect()->intended('DashboardAdmin');
                 case 'Petani':
-                    return redirect()->intended('DashboardPetani');
                 case 'Konsumen':
-                    return redirect()->intended('DashboardKonsumen');
+                    return redirect()->route('belanja.index');
                 default:
                     Auth::logout();
                     return redirect('/login')->withErrors(['role' => 'Role tidak dikenali.']);

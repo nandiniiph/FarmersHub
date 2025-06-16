@@ -1,10 +1,10 @@
 @extends($layout)
 
-@section('title', 'Riwayat Pemesanan')
+@section('title', 'Pesanan Saya')
 
 @section('content')
 <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">Riwayat Pemesanan</h1>
+    <h1 class="text-2xl font-bold mb-4">Pesanan Saya</h1>
 
     @if(session('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    @if($transaksiList->count())
+    @if($transaksi->count())
         <table class="w-full table-auto border-collapse">
             <thead>
                 <tr class="bg-green-700 text-white">
@@ -24,7 +24,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($transaksiList as $item)
+                @foreach($transaksi as $item)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-2 text-sm text-gray-600">
                             {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y, H:i') }}
@@ -32,13 +32,13 @@
                         <td class="p-2">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
                         <td class="p-2">
                             <span class="inline-block px-2 py-1 rounded text-sm
-                                @if($item->status == 'Lunas') bg-green-200 text-green-800
+                                @if($item->status == 'Pending') bg-yellow-200 text-yellow-800
+                                @elseif($item->status == 'Lunas') bg-green-200 text-green-800
                                 @elseif($item->status == 'Batal') bg-red-200 text-red-800
                                 @else bg-gray-200 text-gray-800
                                 @endif">
                                 {{ $item->status }}
                             </span>
-                        </td>
                         </td>
                         <td class="p-2">{{ $item->detail_transaksi_count }} item</td>
                         <td class="p-2">
@@ -50,7 +50,7 @@
             </tbody>
         </table>
     @else
-        <p class="text-gray-600">Belum ada riwayat pemesanan.</p>
+        <p class="text-gray-600">Belum ada pesanan.</p>
     @endif
 </div>
 @endsection

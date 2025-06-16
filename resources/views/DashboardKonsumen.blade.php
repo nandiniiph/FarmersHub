@@ -1,5 +1,5 @@
 @extends('layouts.appKonsumen')
 
 @section('content')
-Ini Konsumen
+    @include('belanja.index')
 @endsection

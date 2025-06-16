@@ -10,13 +10,25 @@ use Illuminate\Http\Request;
 
 class BelanjaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $produk = $user->role == 'Petani'
-            ? Produk::where('user_id', '!=', $user->user_id)->get()
-            : Produk::all();
-        $layout = Auth::user()->role == 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
+        $search = $request->input('search');
+
+        $query = Produk::query();
+        if ($user->role === 'Petani') {
+            $query->where('user_id', '!=', $user->user_id);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_produk', 'like', '%' . $search . '%')
+                ->orWhere('deskripsi', 'like', '%' . $search . '%');
+            });
+        }
+
+        $produk = $query->get();
+        $layout = $user->role === 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
 
         return view('belanja.index', compact('produk', 'layout'));
     }
@@ -25,7 +37,7 @@ class BelanjaController extends Controller
     {
         $keranjang = Keranjang::with('DetailKeranjang.Produk')
             ->where('user_id', auth()->id())
-            ->first(); // atau ->latest()->first() jika bisa banyak
+            ->first();
         $layout = Auth::user()->role == 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
 
         return view('keranjang.index', compact('keranjang', 'layout'));
@@ -58,6 +70,29 @@ class BelanjaController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
     }
 
+    public function updateJumlah(Request $request, $id)
+    {
+        $item = DetailKeranjang::findOrFail($id);
+
+        if ($item->Keranjang->user_id !== Auth::id()) {
+            return back()->with('error', 'Akses ditolak.');
+        }
+
+        $action = $request->input('action');
+
+        if ($action === 'plus') {
+            $item->jumlah += 1;
+        } elseif ($action === 'minus' && $item->jumlah > 1) {
+            $item->jumlah -= 1;
+        }
+
+        $item->save();
+
+        return back()->with('success', 'Jumlah produk berhasil diperbarui.');
+    }
+
+
+
     public function hapusItem($id)
     {
         $item = DetailKeranjang::with('Keranjang')->findOrFail($id);
@@ -68,5 +103,4 @@ class BelanjaController extends Controller
 
         return redirect()->back()->with('error', 'Akses ditolak.');
     }
-
 }

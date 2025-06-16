@@ -20,17 +20,17 @@ class Transaksi extends Model
         'status'
     ];
 
-    public function Akun()
+    public function user()
     {
         return $this->belongsTo(Akun::class, 'user_id');
     }
 
-    public function DetailTransaksi()
+    public function detailTransaksi()
     {
         return $this->hasMany(DetailTransaksi::class, 'transaksi_id');
     }
 
-    public function Produk()
+    public function produk()
     {
         return $this->hasManyThrough(
             Produk::class,

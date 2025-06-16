@@ -10,7 +10,7 @@
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8 ml-10">
                     <a href="{{ route('belanja.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Belanja</a>
                     <a href="{{ route('keranjang.lihat') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Keranjang</a>
-                    <a href="{{ route('transaksi.pesanan') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Pesanan</a>
+                    <a href="{{ route('pesanan.saya') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Pesanan Saya</a>
                     <a href="{{ route('transaksi.riwayat') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Riwayat</a>
                     <a href="{{ route('produk.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Produk</a>
                     <a href="{{ route('profil.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Profil</a>

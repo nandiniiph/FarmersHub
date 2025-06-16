@@ -18,10 +18,13 @@ Route::get('/Register', [LoginController::class, 'showRegister'])->name('showReg
 Route::post('/proses-Register', [LoginController::class, 'register'])->name('register');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Dashboard
+// Dashboard Admin tetap pakai controller khusus
 Route::get('/DashboardAdmin', [LoginController::class, 'showDashboardAdmin'])->name('showDashboardAdmin');
-Route::get('/DashboardKonsumen', [LoginController::class, 'showDashboardKonsumen'])->name('showDashboardKonsumen');
-Route::get('/DashboardPetani', [LoginController::class, 'showDashboardPetani'])->name('showDashboardPetani');
+
+// Dashboard Petani dan Konsumen langsung arahkan ke halaman belanja
+Route::get('/DashboardPetani', [BelanjaController::class, 'index'])->name('showDashboardPetani');
+Route::get('/DashboardKonsumen', [BelanjaController::class, 'index'])->name('showDashboardKonsumen');
+
 
 // Dashboard dinamis sesuai peran
 Route::get('/dashboard', function () {
@@ -31,11 +34,12 @@ Route::get('/dashboard', function () {
         return redirect()->route('showLogin');
     }
 
-    return match ($user->role) {
-        'Admin' => redirect()->route('showDashboardAdmin'),
-        'Petani' => redirect()->route('showDashboardPetani'),
-        default => redirect()->route('showDashboardKonsumen'),
-    };
+    if ($user->role === 'Admin') {
+        return redirect()->route('showDashboardAdmin');
+    }
+
+    // Petani & Konsumen langsung ke halaman belanja
+    return redirect()->route('belanja.index');
 })->middleware('auth')->name('dashboard');
 
 
@@ -58,14 +62,17 @@ Route::prefix('produk')->group(function () {
 Route::get('/belanja', [BelanjaController::class, 'index'])->name('belanja.index');
 Route::post('/keranjang/tambah/{product_id}', [BelanjaController::class, 'tambahKeranjang'])->name('keranjang.tambah');
 Route::get('/keranjang', [BelanjaController::class, 'lihatKeranjang'])->name('keranjang.lihat');
+Route::post('/keranjang/update-jumlah/{id}', [BelanjaController::class, 'updateJumlah'])->name('keranjang.updateJumlah');
 Route::delete('/keranjang/hapus/{id}', [BelanjaController::class, 'hapusItem'])->name('keranjang.hapus');
 
 
 // Transaksi: Checkout, Pesanan, dan Riwayat
 Route::post('/checkout', [TransaksiController::class, 'checkout'])->name('checkout');
-Route::get('/pesanan', [TransaksiController::class, 'pesanan'])->name('transaksi.pesanan');
-Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
 Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+Route::get('/pesanan', [TransaksiController::class, 'pesananSaya'])->name('pesanan.saya');
+Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
+Route::post('/transaksi/{id}/bayar', [TransaksiController::class, 'konfirmasiBayar'])->name('transaksi.bayar');
+Route::put('/transaksi/{id}/batal', [TransaksiController::class, 'batalkan'])->name('transaksi.batal');
 
 // Fitur tambahan
 Route::get('/upgrade', [UpgradeController::class, 'index'])->name('upgrade.index');
