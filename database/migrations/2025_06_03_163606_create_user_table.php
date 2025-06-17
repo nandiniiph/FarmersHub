@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('role', ['Admin', 'Konsumen', 'Petani']);
             $table->boolean('status')
                 ->default(true);
+            $table->integer('saldo');
             $table->timestamps();
         });
     }

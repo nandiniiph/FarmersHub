@@ -20,6 +20,7 @@ class Akun extends Authenticatable
         'password',
         'role',
         'status',
+        'saldo'
     ];
 
     protected $hidden = [
