@@ -2,7 +2,7 @@
     use Carbon\Carbon;
 @endphp
 
-@extends('layouts.appPetani')
+@extends('layouts.appKonsumen')
 
 @section('content')
 @if(session('success'))

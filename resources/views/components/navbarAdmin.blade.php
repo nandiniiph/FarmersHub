@@ -8,9 +8,23 @@
             </div>
             <div class="flex items-center">
                 <div class="hidden sm:ml-6 sm:flex sm:space-x-8 ml-10">
-                    <a href="{{ route('upgrade.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Upgrade</a>
-                    <a href="{{ route('akun.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Manajemen Akun</a>
-                    <a href="{{ route('profil.index') }}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">Profil</a>
+                    <a href="{{ route('upgrade.index') }}"
+                        class="inline-flex items-center px-3 py-1 text-sm font-medium rounded hover:underline
+                        {{ Route::is('upgrade.index') ? 'bg-green-100 text-green-800' : '' }}">
+                        Konfirmasi Permohonan
+                    </a>
+
+                    <a href="{{ route('akun.index') }}"
+                        class="inline-flex items-center px-3 py-1 text-sm font-medium rounded hover:underline
+                        {{ Route::is('akun.index') ? 'bg-green-100 text-green-800' : '' }}">
+                        Manajemen Akun
+                    </a>
+
+                    <a href="{{ route('profil.index') }}"
+                        class="inline-flex items-center px-3 py-1 text-sm font-medium rounded hover:underline
+                        {{ Route::is('profil.index') ? 'bg-green-100 text-green-800' : '' }}">
+                        Profil
+                    </a>
                 </div>
             </div>
         </div>
