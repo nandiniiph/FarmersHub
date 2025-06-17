@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Akun;
+use App\Models\PermohonanUpgrade;
 use App\Models\Produk;
 
 class LoginController extends Controller
@@ -22,7 +23,12 @@ class LoginController extends Controller
 
     public function showDashboardAdmin()
     {
-        return view('DashboardAdmin');
+        $totalUsers = Akun::count();
+        $totalPetani = Akun::where('role', 'Petani')->count();
+        $totalKonsumen = Akun::where('role', 'Konsumen')->count();
+        $totalPermohonanMenunggu = PermohonanUpgrade::where('status', 'Menunggu')->count();
+
+        return view('DashboardAdmin', compact('totalUsers', 'totalPetani', 'totalKonsumen', 'totalPermohonanMenunggu'));
     }
 
     public function showDashboardKonsumen()
