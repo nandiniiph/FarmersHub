@@ -24,6 +24,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->integer('jumlah');
+            $table->enum('status', ['Menunggu', 'Diproses', 'Dikirim', 'Selesai']);
             $table->timestamps();
         });
     }
