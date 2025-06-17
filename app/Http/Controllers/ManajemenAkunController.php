@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Akun;
+use App\Models\PermohonanUpgrade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,15 @@ class ManajemenAkunController extends Controller
     public function Profil()
     {
         $user = Auth::user();
-        return view('profil.index', compact('user'));
+        $latestUpgradeRequest = null;
+
+        if ($user->role === 'Petani') {
+            $latestUpgradeRequest = PermohonanUpgrade::where('user_id', $user->user_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+
+        return view('profil.index', compact('user', 'latestUpgradeRequest'));
     }
 
     public function showEditProfil()
