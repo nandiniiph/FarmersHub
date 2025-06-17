@@ -58,6 +58,9 @@ Route::post('/akun/{id}/delete', [ManajemenAkunController::class, 'HapusAkun'])-
 Route::get('/PengajuanUpgrade', [UpgradeController::class, 'showTambahUpgrade'])->name('showTambahUpgrade');
 Route::get('/KonfirmasiUpgrade', [UpgradeController::class, 'index'])->name('upgrade.index');
 Route::post('/tambahUpgrade', [UpgradeController::class, 'createPengajuan'])->name('createPengajuan');
+Route::post('/permohonan/setujui/{id}', [UpgradeController::class, 'SetujuiPermohonan'])->name('SetujuiPermohonan');
+Route::get('/upgrade/update/{id}', [UpgradeController::class, 'showUpdateUpgrade'])->name('showUpdateUpgrade');
+Route::post('/permohonan/tolak/{id}', [UpgradeController::class, 'TolakPermohonan'])->name('TolakPermohonan');
 
 // Produk (Petani)
 Route::prefix('produk')->group(function () {

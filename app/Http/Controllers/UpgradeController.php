@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Akun;
 use App\Models\PermohonanUpgrade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,5 +62,51 @@ class UpgradeController extends Controller
             'catatan_admin' => '',
         ]);
         return redirect()->route('showTambahUpgrade')->with('success', 'Permohonan upgrade berhasil diajukan. Form dinonaktifkan untuk sementara, mohon tunggu konfirmasi dari admin.');
+    }
+
+    public function showUpdateUpgrade($id)
+    {
+        $permohonan = PermohonanUpgrade::find($id);
+        if (!$permohonan) {
+            return redirect()->route('upgrade.index')->with('error', 'Permohonan tidak ditemukan.');
+        }
+        return view('upgrade.updateUpgrade', compact('permohonan'));
+    }
+
+    public function SetujuiPermohonan($id)
+    {
+        $permohonan = PermohonanUpgrade::find($id);
+
+        if ($permohonan) {
+            $permohonan->status = 'Disetujui';
+            $permohonan->save();
+
+            $akun = Akun::where('user_id', $permohonan->user_id)->first();
+            if ($akun) {
+                $akun->role = 'Petani';
+                $akun->save();
+            }
+            return redirect()->route('upgrade.index')->with('success', 'Permohonan telah disetujui');
+        }
+        return redirect()->route('upgrade.index');
+    }
+
+    public function TolakPermohonan(Request $request, $id)
+    {
+        $request->validate([
+            'catatan_admin' => 'required|string|max:255',
+        ]);
+
+        $permohonan = PermohonanUpgrade::find($id);
+
+        if (!$permohonan) {
+            return redirect()->route('upgrade.index')->with('error', 'Permohonan tidak ditemukan.');
+        }
+
+        $permohonan->catatan_admin = $request->catatan_admin;
+        $permohonan->status = 'Ditolak';
+        $permohonan->save();
+
+        return redirect()->route('upgrade.index')->with('success', 'Permohonan telah ditolak');
     }
 }
