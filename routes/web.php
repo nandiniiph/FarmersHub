@@ -9,6 +9,7 @@ use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UpgradeController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\PesananPetaniController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', fn() => view('LandingPage'));
 
@@ -80,6 +81,28 @@ Route::middleware('auth')->group(function () {
     //  Pesanan Masuk
     Route::get('/pesanan-masuk', [PesananPetaniController::class, 'pesananMasuk'])->name('pesanan.masuk');
     Route::post('/transaksi/update-status/{id}', [PesananPetaniController::class, 'updateStatus'])->name('transaksi.updateStatus');
-    Route::get('/transaksi/invoice/{id}', [PesananPetaniController::class, 'invoice'])->name('transaksi.invoice');
+    Route::get('/transaksi/invoice/{id}', [PesananPetaniController::class, 'invoice'])->name('transaksi.invoice');}
+);
 
+// Akun
+Route::get('/akun', [ManajemenAkunController::class, 'showAkun'])->name('akun.index');
+Route::get('/akunFilter', [ManajemenAkunController::class, 'FilterAkun'])->name('FilterAkun');
+Route::post('/akun/{id}/delete', [ManajemenAkunController::class, 'HapusAkun'])->name('HapusAkun');
+
+// Upgrade
+Route::get('/PengajuanUpgrade', [UpgradeController::class, 'showTambahUpgrade'])->name('showTambahUpgrade');
+Route::get('/KonfirmasiUpgrade', [UpgradeController::class, 'index'])->name('upgrade.index');
+Route::post('/tambahUpgrade', [UpgradeController::class, 'createPengajuan'])->name('createPengajuan');
+Route::post('/permohonan/setujui/{id}', [UpgradeController::class, 'SetujuiPermohonan'])->name('SetujuiPermohonan');
+Route::get('/upgrade/update/{id}', [UpgradeController::class, 'showUpdateUpgrade'])->name('showUpdateUpgrade');
+Route::post('/permohonan/tolak/{id}', [UpgradeController::class, 'TolakPermohonan'])->name('TolakPermohonan');
+
+// Produk (Petani)
+Route::prefix('produk')->group(function () {
+    Route::get('/index', [ManajemenProdukController::class, 'index'])->name('produk.index');
+    Route::get('/tambahProduk', [ManajemenProdukController::class, 'create'])->name('produk.create');
+    Route::post('/simpanProduk', [ManajemenProdukController::class, 'store'])->name('produk.store');
+    Route::get('/editProduk/{id}', [ManajemenProdukController::class, 'edit'])->name('produk.edit');
+    Route::put('/updateProduk/{id}', [ManajemenProdukController::class, 'update'])->name('produk.update');
+    Route::delete('/hapusProduk/{id}', [ManajemenProdukController::class, 'destroy'])->name('produk.destroy');
 });

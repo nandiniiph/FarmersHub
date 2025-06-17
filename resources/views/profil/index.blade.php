@@ -13,10 +13,10 @@
 
 @section("content")
 @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 text-center rounded">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 text-center rounded">
+        {{ session('success') }}
+    </div>
+@endif
 
 <main class="p-6">
 
