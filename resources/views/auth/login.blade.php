@@ -44,7 +44,7 @@
 
             <div class="mt-4 text-center text-sm text-gray-600">
                 Belum punya akun?
-                <a href="{{ route('showRegister') }}" class="text-green-600 hover:underline">Daftar di sini</a>
+                <a href="{{ route('showRegister') }}" class="text-green-600 hover:underline">Register</a>
             </div>
         </div>
     </div>

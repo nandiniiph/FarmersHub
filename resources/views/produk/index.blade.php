@@ -37,7 +37,13 @@
                     </td>
                     <td class="border border-gray-300 px-4 py-2">{{ $item->nama_produk }}</td>
                     <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $item->stok }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">
+                        @if ($item->stok > 0)
+                            {{ $item->stok }}
+                        @else
+                            <span class="text-red-600 font-bold">Stok Habis</span>
+                        @endif
+                    </td>
                     <td class="border border-gray-300 px-4 py-2 space-x-2">
                         <a href="{{ route('produk.edit', $item->product_id) }}" class="text-blue-600 hover:underline">Edit</a>
                         <form action="{{ route('produk.destroy', $item->product_id) }}" method="POST" class="inline-block">

@@ -9,20 +9,41 @@
     </div>
 
     <div class="mb-6">
-        <p><strong>Nama:</strong> {{ $transaksi->User->username }}</p>
-        <p><strong>Email:</strong> {{ $transaksi->User->email }}</p>
-        <p><strong>Status:</strong>
-            <span class="inline-block px-2 py-1 rounded
-                {{ match($transaksi->status) {
-                    'Menunggu Pembayaran' => 'bg-yellow-200 text-yellow-800',
-                    'Selesai', 'Lunas' => 'bg-green-200 text-green-800',
-                    'Batal' => 'bg-red-200 text-red-800',
-                    default => 'bg-gray-200 text-gray-800'
-                } }}">
-                {{ $transaksi->status }}
-            </span>
-        </p>
-    </div>
+    <p><strong>Nama:</strong> {{ $transaksi->User->username }}</p>
+    <p><strong>Email:</strong> {{ $transaksi->User->email }}</p>
+
+    {{-- Status Pembayaran --}}
+    <p><strong>Status Pembayaran:</strong>
+        <span class="inline-block px-2 py-1 rounded
+            {{ match($transaksi->status) {
+                'Menunggu Pembayaran' => 'bg-yellow-200 text-yellow-800',
+                'Selesai', 'Lunas' => 'bg-green-200 text-green-800',
+                'Batal' => 'bg-red-200 text-red-800',
+                default => 'bg-gray-200 text-gray-800'
+            } }}">
+            {{ $transaksi->status }}
+        </span>
+    </p>
+
+    {{-- Status Pesanan --}}
+    <p><strong>Status Pesanan:</strong>
+        @php
+            $statusPesanan = $transaksi->detailTransaksi->first()->status ?? '-';
+        @endphp
+
+        <span class="inline-block px-2 py-1 rounded text-sm
+            @switch($statusPesanan)
+                @case('Menunggu') bg-gray-200 text-gray-800 @break
+                @case('Diproses') bg-yellow-100 text-yellow-700 @break
+                @case('Dikirim') bg-blue-100 text-blue-700 @break
+                @case('Selesai') bg-green-200 text-green-800 @break
+                @case('Batal') bg-red-200 text-red-800 @break
+                @default bg-gray-100 text-gray-600
+            @endswitch">
+            {{ $statusPesanan }}
+        </span>
+    </p>
+</div>
 
     <h3 class="font-semibold text-lg mb-2">Detail Produk:</h3>
     <table class="w-full border-collapse">
@@ -90,6 +111,12 @@
             </button>
         </form>
     @endif
+
+    <a href="{{ route('belanja.index') }}"
+    class="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
+        ← Kembali ke Belanja
+    </a>
+
 
 </div>
 @endsection

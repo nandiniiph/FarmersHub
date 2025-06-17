@@ -18,29 +18,32 @@
                 <tr class="bg-green-700 text-white">
                     <th class="p-2 text-left">Tanggal</th>
                     <th class="p-2 text-left">Total</th>
-                    <th class="p-2 text-left">Status</th>
                     <th class="p-2 text-left">Jumlah Item</th>
+                    <th class="p-2 text-left">Status</th>
                     <th class="p-2 text-left">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($transaksiList as $item)
+                    @php
+                        $statusPesanan = $item->detailTransaksi->first()->status ?? '-';
+                    @endphp
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-2 text-sm text-gray-600">
                             {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y, H:i') }}
                         </td>
                         <td class="p-2">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                        <td class="p-2">{{ $item->detailTransaksi->count() }} item</td>
+
+                        {{-- Status Final --}}
                         <td class="p-2">
-                            <span class="inline-block px-2 py-1 rounded text-sm
-                                @if($item->status == 'Lunas') bg-green-200 text-green-800
-                                @elseif($item->status == 'Batal') bg-red-200 text-red-800
-                                @else bg-gray-200 text-gray-800
-                                @endif">
-                                {{ $item->status }}
-                            </span>
+                            @if($item->status === 'Batal')
+                                <span class="inline-block bg-red-200 text-red-800 px-2 py-1 rounded text-sm">Batal</span>
+                            @elseif($statusPesanan === 'Selesai')
+                                <span class="inline-block bg-green-200 text-green-800 px-2 py-1 rounded text-sm">Selesai</span>
+                            @endif
                         </td>
-                        </td>
-                        <td class="p-2">{{ $item->detail_transaksi_count }} item</td>
+
                         <td class="p-2">
                             <a href="{{ route('transaksi.show', $item->transaksi_id) }}"
                                class="text-green-700 hover:underline">Lihat Detail</a>

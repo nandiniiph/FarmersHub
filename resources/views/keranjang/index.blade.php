@@ -38,6 +38,11 @@
                                 class="accent-green-600 produk-checkbox"
                                 data-harga="{{ $item->Produk->harga }}"
                                 data-jumlah="{{ $item->jumlah }}">
+
+                            <input type="hidden"
+                                name="jumlah[]"
+                                value="{{ $item->jumlah }}"
+                                form="checkoutForm">
                         </td>
                         <td class="p-2">{{ $item->Produk->nama_produk }}</td>
                         <td class="p-2">Rp {{ number_format($item->Produk->harga, 0, ',', '.') }}</td>
@@ -69,6 +74,7 @@
         {{-- Form Checkout --}}
         <form id="checkoutForm" action="{{ route('checkout') }}" method="POST" onsubmit="return validateCheckout()" class="text-right mt-4">
             @csrf
+            <input type="hidden" name="checkout_from" value="keranjang">
             <input type="hidden" name="total_dikirim" id="total_dikirim">
             <button type="submit" class="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-800 transition-all duration-200">
                 Checkout

@@ -91,8 +91,6 @@ class BelanjaController extends Controller
         return back()->with('success', 'Jumlah produk berhasil diperbarui.');
     }
 
-
-
     public function hapusItem($id)
     {
         $item = DetailKeranjang::with('Keranjang')->findOrFail($id);
