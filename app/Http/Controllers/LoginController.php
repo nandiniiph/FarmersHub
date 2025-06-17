@@ -96,6 +96,7 @@ class LoginController extends Controller
             'email' => $request->email,
             'password' => $request->password,
             'role' => 'konsumen',
+            'saldo' => 0,
             'status' => true,
         ]);
 
