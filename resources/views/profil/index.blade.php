@@ -25,7 +25,9 @@
                 <div>
                     <h3 class="text-3xl font-bold text-gray-900">{{ $user->username }}</h3>
                     <p class="text-gray-600 text-lg">{{ $user->role }}</p>
-                    <p class="text-gray-600 text-lg">Saldo: Rp{{ number_format($user->saldo, 0, ',', '.') }}</p>
+                    @if($user->role === 'Konsumen' || $user->role === 'Petani')
+                        <p class="text-gray-600 text-lg">Saldo: Rp{{ number_format($user->saldo, 0, ',', '.') }}</p>
+                    @endif
                 </div>
             </div>
             <div class="flex gap-2">
