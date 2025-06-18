@@ -8,7 +8,7 @@ use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
 use App\Models\DetailKeranjang;
 use App\Models\Produk;
-use App\Models\User;
+use App\Models\Akun;
 
 class TransaksiController extends Controller
 {
@@ -100,7 +100,6 @@ class TransaksiController extends Controller
             }
         }
 
-        // Kelompokkan item berdasarkan pemilik produk
         $groupedByOwner = collect($items)->groupBy('owner_id');
 
         $createdTransactionIds = [];
@@ -128,12 +127,10 @@ class TransaksiController extends Controller
                     'status' => 'Menunggu',
                 ]);
 
-                // Reserve stok (kurangi stok sementara)
                 $produkModel = Produk::findOrFail($produk['product_id']);
                 $produkModel->stok = max(0, $produkModel->stok - $produk['jumlah']);
                 $produkModel->save();
 
-                // Hapus item dari keranjang jika checkout dari keranjang
                 if (isset($produk['detail_id'])) {
                     DetailKeranjang::where('detail_keranjang_id', $produk['detail_id'])->delete();
                 }
@@ -142,7 +139,6 @@ class TransaksiController extends Controller
             $createdTransactionIds[] = $transaksi->transaksi_id;
         }
 
-        // Redirect sesuai jumlah transaksi
         if (count($createdTransactionIds) === 1) {
             return redirect()->route('transaksi.show', $createdTransactionIds[0])
                 ->with('success', 'Checkout berhasil! Silakan konfirmasi pembayaran.');
@@ -181,34 +177,32 @@ class TransaksiController extends Controller
         // Tambahkan saldo ke petani
         foreach ($transaksi->detailTransaksi as $detail) {
             $produk = $detail->produk;
-            $petani = User::find($produk->user_id);
+            $pendapatan = $detail->harga_satuan * $detail->jumlah;
 
-            if ($petani && $petani->role === 'Petani') {
-                $pendapatan = $detail->harga_satuan * $detail->jumlah;
-                $petani->saldo += $pendapatan;
-                $petani->save();
+            if ($produk) {
+                $petani = Akun::find($produk->user_id);
+                if ($petani) {
+                    $petani->saldo += $pendapatan;
+                    $petani->save();
+                }
             }
         }
 
         $userId = $user->user_id;
 
-        // Cek apakah masih ada transaksi lain yang belum lunas
         $transaksiPending = Transaksi::where('user_id', $userId)
             ->where('status', '!=', 'Lunas')
             ->count();
 
-        // Jika semua transaksi user sudah lunas, redirect ke halaman pesanan
         if ($transaksiPending === 0) {
             return redirect()->route('pesanan.index')->with('success', 'Pembayaran berhasil! Saldo dipotong Rp ' . number_format($transaksi->total_harga, 0, ',', '.') . ' dan saldo petani diperbarui.');
         }
 
-        // Ambil semua transaksi user
         $semuaTransaksi = Transaksi::with(['detailTransaksi.produk', 'user'])
             ->where('user_id', $userId)
             ->latest()
             ->get();
 
-        // Tentukan layout berdasarkan role
         $layout = $user->role === 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
 
         // Tampilkan halaman transaksi dengan banyak transaksi
