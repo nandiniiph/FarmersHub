@@ -30,7 +30,7 @@
             @endif
         </div>
 
-        <form action="{{ route('storeSaldo') }}" method="POST">
+        <form action="{{ route('tambahSaldo') }}" method="POST">
             @csrf
             <div class="grid grid-cols-1 gap-6 mt-4">
                 <div>

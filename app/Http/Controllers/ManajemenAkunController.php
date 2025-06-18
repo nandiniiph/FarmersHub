@@ -74,7 +74,7 @@ class ManajemenAkunController extends Controller
         return redirect()->route('profil.index')->with('success', 'Profil berhasil diedit!');
     }
 
-    public function storeSaldo(Request $request)
+    public function tambahSaldo(Request $request)
     {
         $request->validate([
             'saldo' => 'required|numeric|min:1',
