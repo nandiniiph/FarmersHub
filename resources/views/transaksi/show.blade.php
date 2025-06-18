@@ -71,11 +71,32 @@
         </tbody>
     </table>
 
+    {{-- Informasi Saldo --}}
+    @if ($transaksi->status === 'Pending')
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
+            <h4 class="font-semibold text-blue-800 mb-2">Informasi Saldo:</h4>
+            <div class="text-sm text-blue-700">
+                <p><strong>Saldo Anda saat ini:</strong> Rp{{ number_format(Auth::user()->saldo, 0, ',', '.') }}</p>
+                <p><strong>Total yang harus dibayar:</strong> Rp{{ number_format($transaksi->total_harga, 0, ',', '.') }}</p>
+                @if (Auth::user()->saldo >= $transaksi->total_harga)
+                    <p class="text-green-600 font-semibold mt-2">✓ Saldo Anda mencukupi untuk pembayaran ini</p>
+                @else
+                    @php
+                        $kekurangan = $transaksi->total_harga - Auth::user()->saldo;
+                    @endphp
+                    <p class="text-red-600 font-semibold mt-2">⚠ Saldo Anda tidak mencukupi</p>
+                    <p class="text-red-600"><strong>Kekurangan saldo:</strong> Rp{{ number_format($kekurangan, 0, ',', '.') }}</p>
+                    <p class="text-sm text-gray-600 mt-1">Silakan top up saldo Anda terlebih dahulu sebelum melakukan pembayaran.</p>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Metode Pembayaran --}}
     @if ($transaksi->status === 'Pending')
         <div class="mt-6">
             <h3 class="text-lg font-semibold mb-2">Pilih Metode Pembayaran:</h3>
-            <form action="{{ route('transaksi.bayar', $transaksi->transaksi_id) }}" method="POST">
+            <form action="{{ route('transaksi.bayar', $transaksi->transaksi_id) }}" method="POST" id="payment-form">
                 @csrf
                 <div class="space-y-2">
                     <label class="block">
@@ -91,12 +112,36 @@
                         <span class="ml-2">Bayar di Tempat (COD)</span>
                     </label>
                 </div>
-                <button type="submit"
-                    class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                <button type="submit" id="payment-button"
+                    class="mt-4 px-4 py-2 rounded transition
+                    @if (Auth::user()->saldo >= $transaksi->total_harga)
+                        bg-green-600 text-white hover:bg-green-700
+                    @else
+                        bg-gray-400 text-gray-600 cursor-not-allowed
+                    @endif">
                     Konfirmasi Pembayaran
                 </button>
             </form>
         </div>
+
+        {{-- JavaScript untuk validasi saldo --}}
+        <script>
+            document.getElementById('payment-form').addEventListener('submit', function(e) {
+                const userSaldo = {{ Auth::user()->saldo }};
+                const totalHarga = {{ $transaksi->total_harga }};
+
+                if (userSaldo < totalHarga) {
+                    e.preventDefault();
+                    const kekurangan = totalHarga - userSaldo;
+                    alert('Saldo Anda tidak mencukupi untuk melakukan pembayaran ini.\n\n' +
+                          'Saldo saat ini: Rp ' + userSaldo.toLocaleString('id-ID') + '\n' +
+                          'Total pembayaran: Rp ' + totalHarga.toLocaleString('id-ID') + '\n' +
+                          'Kekurangan saldo: Rp ' + kekurangan.toLocaleString('id-ID') + '\n\n' +
+                          'Silakan top up saldo Anda terlebih dahulu.');
+                    return false;
+                }
+            });
+        </script>
     @endif
 
     {{-- Tombol Batalkan Pesanan --}}
@@ -116,7 +161,6 @@
     class="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
         ← Kembali ke Belanja
     </a>
-
 
 </div>
 @endsection

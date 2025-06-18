@@ -8,6 +8,7 @@ use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
 use App\Models\DetailKeranjang;
 use App\Models\Produk;
+use App\Models\User;
 
 class TransaksiController extends Controller
 {
@@ -42,9 +43,6 @@ class TransaksiController extends Controller
 
         return view('transaksi.multiple', compact('transaksis', 'layout'));
     }
-
-
-
 
     public function checkout(Request $request)
     {
@@ -104,6 +102,7 @@ class TransaksiController extends Controller
 
         // Kelompokkan item berdasarkan pemilik produk
         $groupedByOwner = collect($items)->groupBy('owner_id');
+
         $createdTransactionIds = [];
 
         foreach ($groupedByOwner as $ownerId => $produkGroup) {
@@ -112,6 +111,7 @@ class TransaksiController extends Controller
                 $total += $produk['harga'] * $produk['jumlah'];
             }
 
+            // Buat transaksi dengan status 'Pending'
             $transaksi = Transaksi::create([
                 'user_id' => $userId,
                 'status' => 'Pending',
@@ -128,10 +128,12 @@ class TransaksiController extends Controller
                     'status' => 'Menunggu',
                 ]);
 
+                // Reserve stok (kurangi stok sementara)
                 $produkModel = Produk::findOrFail($produk['product_id']);
                 $produkModel->stok = max(0, $produkModel->stok - $produk['jumlah']);
                 $produkModel->save();
 
+                // Hapus item dari keranjang jika checkout dari keranjang
                 if (isset($produk['detail_id'])) {
                     DetailKeranjang::where('detail_keranjang_id', $produk['detail_id'])->delete();
                 }
@@ -143,11 +145,11 @@ class TransaksiController extends Controller
         // Redirect sesuai jumlah transaksi
         if (count($createdTransactionIds) === 1) {
             return redirect()->route('transaksi.show', $createdTransactionIds[0])
-                ->with('success', 'Checkout berhasil!');
+                ->with('success', 'Checkout berhasil! Silakan konfirmasi pembayaran.');
         }
 
         return redirect()->route('transaksi.multiple', ['ids' => implode(',', $createdTransactionIds)])
-            ->with('success', 'Checkout berhasil dari beberapa penjual!');
+            ->with('success', 'Checkout berhasil! Silakan konfirmasi pembayaran.');
     }
 
     public function konfirmasiBayar(Request $request, $id)
@@ -162,11 +164,32 @@ class TransaksiController extends Controller
             return back()->with('error', 'Transaksi sudah dibayar.');
         }
 
+        // Cek saldo user saat konfirmasi pembayaran
+        $user = Auth::user();
+        if ($user->saldo < $transaksi->total_harga) {
+            return back()->with('error', 'Saldo Anda tidak mencukupi. Saldo: Rp ' . number_format($user->saldo, 0, ',', '.') . ', Total: Rp ' . number_format($transaksi->total_harga, 0, ',', '.'));
+        }
+
+        // Potong saldo user
+        $user->saldo -= $transaksi->total_harga;
+        $user->save();
+
         $transaksi->metode_pembayaran = $request->metode_pembayaran;
         $transaksi->status = 'Lunas';
         $transaksi->save();
 
-        $user = Auth::user(); // ⬅️ Dideklarasikan di sini sebelum dipakai
+        // Tambahkan saldo ke petani
+        foreach ($transaksi->detailTransaksi as $detail) {
+            $produk = $detail->produk;
+            $petani = User::find($produk->user_id);
+
+            if ($petani && $petani->role === 'Petani') {
+                $pendapatan = $detail->harga_satuan * $detail->jumlah;
+                $petani->saldo += $pendapatan;
+                $petani->save();
+            }
+        }
+
         $userId = $user->user_id;
 
         // Cek apakah masih ada transaksi lain yang belum lunas
@@ -176,7 +199,7 @@ class TransaksiController extends Controller
 
         // Jika semua transaksi user sudah lunas, redirect ke halaman pesanan
         if ($transaksiPending === 0) {
-            return redirect()->route('pesanan.index')->with('success', 'Semua transaksi telah dibayar.');
+            return redirect()->route('pesanan.index')->with('success', 'Pembayaran berhasil! Saldo dipotong Rp ' . number_format($transaksi->total_harga, 0, ',', '.') . ' dan saldo petani diperbarui.');
         }
 
         // Ambil semua transaksi user
@@ -192,20 +215,63 @@ class TransaksiController extends Controller
         return view('transaksi.multiple', [
             'transaksis' => $semuaTransaksi,
             'layout' => $layout,
-        ])->with('success', 'Pembayaran berhasil untuk transaksi #' . $transaksi->transaksi_id);
+        ])->with('success', 'Pembayaran berhasil untuk transaksi #' . $transaksi->transaksi_id . '! Saldo dipotong Rp ' . number_format($transaksi->total_harga, 0, ',', '.') . ' dan saldo petani diperbarui.');
     }
-
-
 
     public function batalkan($id)
     {
         $transaksi = Transaksi::findOrFail($id);
 
-        if (in_array($transaksi->status, ['Pending', 'Menunggu Pembayaran'])) {
+        if (in_array($transaksi->status, ['Pending'])) {
+            // Jika transaksi belum dibayar, tidak perlu mengembalikan saldo (karena belum dipotong)
+            // Hanya kembalikan stok produk
+            foreach ($transaksi->detailTransaksi as $detail) {
+                $produk = Produk::find($detail->product_id);
+                if ($produk) {
+                    $produk->stok += $detail->jumlah;
+                    $produk->save();
+                }
+            }
+
             $transaksi->status = 'Batal';
             $transaksi->save();
 
-            return redirect()->route('transaksi.show', $id)->with('success', 'Pesanan berhasil dibatalkan.');
+            return redirect()->route('transaksi.show', $id)->with('success', 'Pesanan dibatalkan dan stok produk dikembalikan.');
+        } elseif (in_array($transaksi->status, ['Lunas'])) {
+            // Jika transaksi sudah dibayar, kembalikan saldo user
+            $user = User::find($transaksi->user_id);
+            if ($user) {
+                $user->saldo += $transaksi->total_harga;
+                $user->save();
+            }
+
+            // Kembalikan saldo petani jika sudah ditransfer
+            if ($transaksi->status === 'Lunas') {
+                foreach ($transaksi->detailTransaksi as $detail) {
+                    $produk = $detail->produk;
+                    $petani = User::find($produk->user_id);
+
+                    if ($petani && $petani->role === 'Petani') {
+                        $pendapatan = $detail->harga_satuan * $detail->jumlah;
+                        $petani->saldo = max(0, $petani->saldo - $pendapatan);
+                        $petani->save();
+                    }
+                }
+            }
+
+            // Kembalikan stok produk
+            foreach ($transaksi->detailTransaksi as $detail) {
+                $produk = Produk::find($detail->product_id);
+                if ($produk) {
+                    $produk->stok += $detail->jumlah;
+                    $produk->save();
+                }
+            }
+
+            $transaksi->status = 'Batal';
+            $transaksi->save();
+
+            return redirect()->route('transaksi.show', $id)->with('success', 'Pesanan dibatalkan, saldo dikembalikan Rp ' . number_format($transaksi->total_harga, 0, ',', '.') . ' dan stok produk dikembalikan.');
         }
 
         return redirect()->route('transaksi.show', $id)->with('error', 'Pesanan tidak dapat dibatalkan.');
