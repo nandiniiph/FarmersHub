@@ -39,6 +39,12 @@ class ManajemenAkunController extends Controller
         return view('akun.index', compact('akun'));
     }
 
+    public function showIsiSaldo()
+    {
+        $saldo = Auth::user();
+        return view('profil.isiSaldo', compact('saldo'));
+    }
+
     public function updateProfil(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -67,6 +73,20 @@ class ManajemenAkunController extends Controller
 
         return redirect()->route('profil.index')->with('success', 'Profil berhasil diedit!');
     }
+
+    public function storeSaldo(Request $request)
+    {
+        $request->validate([
+            'saldo' => 'required|numeric|min:1',
+        ]);
+
+        $userId = Auth::id();
+        Akun::where('user_id', $userId)->update([
+            'saldo' => DB::raw("saldo + {$request->saldo}")
+        ]);
+        return redirect()->route('profil.index')->with('success', 'Saldo berhasil ditambahkan!');
+    }
+
 
     public function HapusAkun($id)
     {
