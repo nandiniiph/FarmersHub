@@ -4,8 +4,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto mt-6 space-y-10">
-    <h2 class="text-2xl font-bold text-center">Checkout Berhasil!</h2>
-    <p class="text-center text-gray-600 mb-6">Berikut adalah daftar transaksi Anda:</p>
+    <h2 class="text-2xl font-bold text-center">Berikut adalah daftar transaksi Anda:</h2>
 
     @foreach ($transaksis as $transaksi)
     <div class="bg-white p-6 shadow rounded">
