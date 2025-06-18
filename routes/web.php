@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/EditProfil', [ManajemenAkunController::class, 'showEditProfil'])->name('showEditProfil');
     Route::post('/proses-EditProfil', [ManajemenAkunController::class, 'updateProfil'])->name('updateProfil');
     Route::get('/IsiSaldo', [ManajemenAkunController::class, 'showIsiSaldo'])->name('showIsiSaldo');
-    Route::post('/Tambah-saldo', [ManajemenAkunController::class, 'storeSaldo'])->name('storeSaldo');
+    Route::post('/Tambah-saldo', [ManajemenAkunController::class, 'tambahSaldo'])->name('tambahSaldo');
 
     //  Produk (Petani)
     Route::prefix('produk')->group(function () {
