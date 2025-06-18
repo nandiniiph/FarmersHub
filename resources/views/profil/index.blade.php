@@ -28,7 +28,12 @@
                     <p class="text-gray-600 text-lg">Saldo: Rp{{ number_format($user->saldo, 0, ',', '.') }}</p>
                 </div>
             </div>
-            <a href="{{ route('showEditProfil') }}" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600">Edit</a>
+            <div class="flex gap-2">
+                <a href="{{ route('showEditProfil') }}" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600">Edit</a>
+                @if($user->role === 'Konsumen' || $user->role === 'Petani')
+                    <a href="{{ route('showIsiSaldo') }}" class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600">Isi Saldo</a>
+                @endif
+            </div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 mt-8">
