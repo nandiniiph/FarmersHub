@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
     //  Transaksi
     Route::post('/checkout', [TransaksiController::class, 'checkout'])->name('checkout');
     Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+    Route::get('/transaksi/multiple/{ids}', [TransaksiController::class, 'tampilkanBeberapaTransaksi'])->name('transaksi.multiple');
+    Route::get('/transaksi/semua', [TransaksiController::class, 'lihatSemua'])->name('transaksi.semua');
     Route::get('/pesanan', [TransaksiController::class, 'pesananSaya'])->name('pesanan.saya');
     Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
     Route::post('/transaksi/{id}/bayar', [TransaksiController::class, 'konfirmasiBayar'])->name('transaksi.bayar');

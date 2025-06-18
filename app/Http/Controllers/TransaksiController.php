@@ -20,24 +20,47 @@ class TransaksiController extends Controller
         return view('transaksi.show', compact('transaksi', 'layout'));
     }
 
+    public function tampilkanBeberapaTransaksi($ids)
+    {
+        $idArray = explode(',', $ids);
+        $transaksis = Transaksi::whereIn('transaksi_id', $idArray)->with('detailTransaksi.produk')->get();
+        $user = Auth::user();
+        $layout = $user->role === 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
+
+        return view('transaksi.multiple', compact('transaksis', 'layout'));
+    }
+
+    public function lihatSemua()
+    {
+        $user = Auth::user();
+        $layout = $user->role === 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
+
+        $transaksis = Transaksi::with(['detailTransaksi.produk', 'user'])
+            ->where('user_id', $user->user_id)
+            ->latest()
+            ->get();
+
+        return view('transaksi.multiple', compact('transaksis', 'layout'));
+    }
+
+
+
     public function checkout(Request $request)
     {
         $userId = Auth::id();
         $checkoutFrom = $request->input('checkout_from');
 
+        $items = [];
+
         if ($checkoutFrom === 'keranjang') {
-            $selectedDetailIds = $request->input('produk_terpilih', []); // isinya detail_keranjang_id
+            $selectedDetailIds = $request->input('produk_terpilih', []);
 
             if (empty($selectedDetailIds)) {
                 return redirect()->back()->with('error', 'Tidak ada produk yang dipilih dari keranjang.');
             }
 
-            $total = 0;
-            $items = [];
-
             foreach ($selectedDetailIds as $detailId) {
                 $detail = DetailKeranjang::with('produk')->findOrFail($detailId);
-
                 $produk = $detail->produk;
                 $jumlahItem = $detail->jumlah;
 
@@ -45,14 +68,47 @@ class TransaksiController extends Controller
                     return redirect()->back()->with('error', 'Stok produk ' . $produk->nama_produk . ' tidak mencukupi.');
                 }
 
-                $total += $produk->harga * $jumlahItem;
+                $items[] = [
+                    'product_id' => $produk->product_id,
+                    'jumlah' => $jumlahItem,
+                    'harga' => $produk->harga,
+                    'owner_id' => $produk->user_id,
+                    'detail_id' => $detail->detail_keranjang_id,
+                ];
+            }
+        } else {
+            $selected = $request->input('produk_terpilih', []);
+            $jumlah = $request->input('jumlah', []);
+
+            if (empty($selected) || count($selected) !== count($jumlah)) {
+                return redirect()->back()->with('error', 'Data produk tidak valid.');
+            }
+
+            foreach ($selected as $i => $productId) {
+                $produk = Produk::findOrFail($productId);
+                $jumlahItem = (int) $jumlah[$i];
+
+                if ($produk->stok < $jumlahItem) {
+                    return redirect()->back()->with('error', 'Stok produk ' . $produk->nama_produk . ' tidak mencukupi.');
+                }
 
                 $items[] = [
                     'product_id' => $produk->product_id,
                     'jumlah' => $jumlahItem,
                     'harga' => $produk->harga,
-                    'detail_id' => $detail->detail_keranjang_id,
+                    'owner_id' => $produk->user_id,
                 ];
+            }
+        }
+
+        // Kelompokkan item berdasarkan pemilik produk
+        $groupedByOwner = collect($items)->groupBy('owner_id');
+        $createdTransactionIds = [];
+
+        foreach ($groupedByOwner as $ownerId => $produkGroup) {
+            $total = 0;
+            foreach ($produkGroup as $produk) {
+                $total += $produk['harga'] * $produk['jumlah'];
             }
 
             $transaksi = Transaksi::create([
@@ -62,82 +118,36 @@ class TransaksiController extends Controller
                 'tanggal_transaksi' => now(),
             ]);
 
-            foreach ($items as $item) {
+            foreach ($produkGroup as $produk) {
                 DetailTransaksi::create([
                     'transaksi_id' => $transaksi->transaksi_id,
-                    'product_id' => $item['product_id'],
-                    'jumlah' => $item['jumlah'],
-                    'harga_satuan' => $item['harga'],
+                    'product_id' => $produk['product_id'],
+                    'jumlah' => $produk['jumlah'],
+                    'harga_satuan' => $produk['harga'],
                     'status' => 'Menunggu',
                 ]);
 
-                $produk = Produk::findOrFail($item['product_id']);
-                $produk->stok = max(0, $produk->stok - $item['jumlah']);
-                $produk->save();
+                $produkModel = Produk::findOrFail($produk['product_id']);
+                $produkModel->stok = max(0, $produkModel->stok - $produk['jumlah']);
+                $produkModel->save();
 
-                DetailKeranjang::where('detail_keranjang_id', $item['detail_id'])->delete();
+                if (isset($produk['detail_id'])) {
+                    DetailKeranjang::where('detail_keranjang_id', $produk['detail_id'])->delete();
+                }
             }
 
-            return redirect()->route('transaksi.show', $transaksi->transaksi_id)
-                ->with('success', 'Checkout berhasil dari keranjang!');
+            $createdTransactionIds[] = $transaksi->transaksi_id;
         }
 
-        // ========== Checkout dari "Beli Sekarang" ==========
-        $selected = $request->input('produk_terpilih', []);
-        $jumlah = $request->input('jumlah', []);
-
-        if (empty($selected)) {
-            return redirect()->back()->with('error', 'Tidak ada produk yang dipilih.');
+        // Redirect sesuai jumlah transaksi
+        if (count($createdTransactionIds) === 1) {
+            return redirect()->route('transaksi.show', $createdTransactionIds[0])
+                ->with('success', 'Checkout berhasil!');
         }
 
-        if (count($selected) !== count($jumlah)) {
-            return redirect()->back()->with('error', 'Data tidak valid.');
-        }
-
-        $total = 0;
-        $items = [];
-
-        foreach ($selected as $i => $productId) {
-            $produk = Produk::findOrFail($productId);
-            $jumlahItem = (int) $jumlah[$i];
-
-            if ($produk->stok < $jumlahItem) {
-                return redirect()->back()->with('error', 'Stok produk ' . $produk->nama_produk . ' tidak mencukupi.');
-            }
-
-            $total += $produk->harga * $jumlahItem;
-            $items[] = [
-                'product_id' => $productId,
-                'jumlah' => $jumlahItem,
-                'harga' => $produk->harga,
-            ];
-        }
-
-        $transaksi = Transaksi::create([
-            'user_id' => $userId,
-            'status' => 'Pending',
-            'total_harga' => $total,
-            'tanggal_transaksi' => now(),
-        ]);
-
-        foreach ($items as $item) {
-            DetailTransaksi::create([
-                'transaksi_id' => $transaksi->transaksi_id,
-                'product_id' => $item['product_id'],
-                'jumlah' => $item['jumlah'],
-                'harga_satuan' => $item['harga'],
-                'status' => 'Menunggu',
-            ]);
-
-            $produk = Produk::findOrFail($item['product_id']);
-            $produk->stok = max(0, $produk->stok - $item['jumlah']);
-            $produk->save();
-        }
-
-        return redirect()->route('transaksi.show', $transaksi->transaksi_id)
-            ->with('success', 'Checkout berhasil dari Beli Sekarang!');
+        return redirect()->route('transaksi.multiple', ['ids' => implode(',', $createdTransactionIds)])
+            ->with('success', 'Checkout berhasil dari beberapa penjual!');
     }
-
 
     public function konfirmasiBayar(Request $request, $id)
     {
@@ -146,12 +156,45 @@ class TransaksiController extends Controller
         ]);
 
         $transaksi = Transaksi::findOrFail($id);
+
+        if ($transaksi->status === 'Lunas') {
+            return back()->with('error', 'Transaksi sudah dibayar.');
+        }
+
         $transaksi->metode_pembayaran = $request->metode_pembayaran;
         $transaksi->status = 'Lunas';
         $transaksi->save();
 
-        return redirect()->route('transaksi.show', $id)->with('success', 'Pembayaran berhasil dikonfirmasi.');
+        $user = Auth::user(); // ⬅️ Dideklarasikan di sini sebelum dipakai
+        $userId = $user->user_id;
+
+        // Cek apakah masih ada transaksi lain yang belum lunas
+        $transaksiPending = Transaksi::where('user_id', $userId)
+            ->where('status', '!=', 'Lunas')
+            ->count();
+
+        // Jika semua transaksi user sudah lunas, redirect ke halaman pesanan
+        if ($transaksiPending === 0) {
+            return redirect()->route('pesanan.index')->with('success', 'Semua transaksi telah dibayar.');
+        }
+
+        // Ambil semua transaksi user
+        $semuaTransaksi = Transaksi::with(['detailTransaksi.produk', 'user'])
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
+
+        // Tentukan layout berdasarkan role
+        $layout = $user->role === 'Petani' ? 'layouts.appPetani' : 'layouts.appKonsumen';
+
+        // Tampilkan halaman transaksi dengan banyak transaksi
+        return view('transaksi.multiple', [
+            'transaksis' => $semuaTransaksi,
+            'layout' => $layout,
+        ])->with('success', 'Pembayaran berhasil untuk transaksi #' . $transaksi->transaksi_id);
     }
+
+
 
     public function batalkan($id)
     {

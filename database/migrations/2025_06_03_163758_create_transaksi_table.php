@@ -20,6 +20,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->date('tanggal_transaksi');
             $table->decimal('total_harga');
+            $table->string('metode_pembayaran')->nullable();
             $table->enum('status', ['Pending', 'Lunas', 'Batal']);
             $table->timestamps();
         });
