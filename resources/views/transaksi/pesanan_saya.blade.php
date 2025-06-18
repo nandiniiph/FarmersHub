@@ -7,8 +7,8 @@
     <h1 class="text-2xl font-bold mb-4">Pesanan Saya</h1>
     <div class="mb-4">
         <a href="{{ route('transaksi.semua') }}"
-        class="inline-block bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition">
-            Lihat Semua Transaksi
+            class="inline-block bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 transition">
+                Lihat Semua Transaksi
         </a>
 
     </div>

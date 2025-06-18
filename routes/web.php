@@ -68,13 +68,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [TransaksiController::class, 'checkout'])->name('checkout');
     Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
     Route::get('/transaksi/multiple/{ids}', [TransaksiController::class, 'tampilkanBeberapaTransaksi'])->name('transaksi.multiple');
-    Route::get('/transaksi/semua', [TransaksiController::class, 'lihatSemua'])->name('transaksi.semua');
     Route::get('/pesanan', [TransaksiController::class, 'pesananSaya'])->name('pesanan.saya');
     Route::get('/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
     Route::post('/transaksi/{id}/bayar', [TransaksiController::class, 'konfirmasiBayar'])->name('transaksi.bayar');
     Route::put('/transaksi/{id}/batal', [TransaksiController::class, 'batalkan'])->name('transaksi.batal');
     Route::post('/transaksi/konfirmasi-selesai/{id}', [TransaksiController::class, 'konfirmasiSelesai'])->name('transaksi.konfirmasiSelesai');
     Route::post('/transaksi/pesanan-diterima/{id}', [TransaksiController::class, 'pesananDiterima'])->name('transaksi.pesananDiterima');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/transaksi', [TransaksiController::class, 'lihatSemua'])->name('transaksi.semua');
+    });
 
     // Upgrade Akun
     Route::get('/PengajuanUpgrade', [UpgradeController::class, 'showTambahUpgrade'])->name('showTambahUpgrade');
